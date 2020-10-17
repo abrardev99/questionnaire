@@ -28,9 +28,17 @@
                 <div class="collapse navbar-collapse" id="navbarSupportedContent">
                     <!-- Left Side Of Navbar -->
                     <ul class="navbar-nav mr-auto">
-                        <li class="nav-item {{ Route::currentRouteName() == 'home' ? 'active' : '' }}">
+                        @auth
+                        <li class="nav-item {{ Route::currentRouteName() === 'home' ? 'active' : '' }}">
                             <a class="nav-link" href="{{ route('home') }}">Home</a>
                         </li>
+                        <li class="nav-item {{ (Route::currentRouteName() === 'questionnaire.create' || Route::currentRouteName() === 'questionnaire.index') ? 'active' : '' }}">
+                            <a class="nav-link" href="{{ route('questionnaire.index') }}">Questionnaire</a>
+                        </li>
+                        <li class="nav-item {{ Route::currentRouteName() == 'something' ? 'active' : '' }}">
+                            <a class="nav-link" href="#">Results</a>
+                        </li>
+                        @endauth
                     </ul>
 
                     <!-- Right Side Of Navbar -->
