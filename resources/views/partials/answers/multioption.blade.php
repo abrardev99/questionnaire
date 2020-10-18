@@ -1,5 +1,6 @@
 <div>
-    @for($choiceIndex=1;  $choiceIndex<=$choicesCounter; $choiceIndex++)
+    @for($choiceIndex=1;  $choiceIndex<=$multiChoicesCounter[$questionIndex]; $choiceIndex++)
+        <div  wire:key="main{{ $questionIndex }}{{ $choiceIndex }}">
         <div class="form-group row">
             <label for="multiOptionAns"
                    class="col-sm-4 col-form-label">Enter Choice {{ $choiceIndex }}</label>
@@ -33,7 +34,7 @@
                     <div class="form-check">
                         <div class="form-check-label">
                             <button role="button"
-                                    wire:click.prevent="deleteChoice"
+                                    wire:click.prevent="deleteMultiChoice({{ $questionIndex}}, {{ $choiceIndex }})"
                                     class="btn btn-link text-danger">Delete
                             </button>
                         </div>
@@ -41,12 +42,13 @@
                 @endif
             </div>
         </div>
+        </div>
     @endfor
     <div class="form-group row">
         <div class="col-sm-4"></div>
         <div class="col-sm-4">
             <div class="btn-group" role="group">
-                <button wire:click.prevent="addChoice" type="button"
+                <button wire:click.prevent="addMultiChoice({{ $questionIndex }})" type="button"
                         class="btn btn-link">Add New Choice
                 </button>
             </div>

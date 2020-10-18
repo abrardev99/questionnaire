@@ -1,5 +1,5 @@
 <div>
-    @for($choiceIndex=1;  $choiceIndex<=$choicesCounter; $choiceIndex++)
+    @for($choiceIndex=1;  $choiceIndex<=$singleChoicesCounter[$questionIndex]; $choiceIndex++)
         <div class="form-group row">
             <label for="single"
                    class="col-sm-4 col-form-label">Enter Choice {{ $choiceIndex }}</label>
@@ -28,7 +28,7 @@
                     <div class="form-check">
                         <div class="form-check-label">
                             <button role="button"
-                                    wire:click.prevent="deleteChoice"
+                                    wire:click.prevent="deleteChoice({{ $questionIndex }})"
                                     class="btn btn-link text-danger">Delete
                             </button>
                         </div>
@@ -41,7 +41,7 @@
         <div class="col-sm-4"></div>
         <div class="col-sm-4">
             <div class="btn-group" role="group">
-                <button wire:click.prevent="addChoice" type="button"
+                <button wire:click.prevent="addChoice({{ $questionIndex }})" type="button"
                         class="btn btn-link">Add New Choice
                 </button>
             </div>

@@ -11,13 +11,14 @@ use Livewire\Component;
 class Create extends Component
 {
     public Questionnaire $questionnaire;
-
-    public int $questionsInputsCounter = 1;
-    public int $choicesCounter = 2;
+    public int $questionsInputsCounter = Answer::InitialQuestions;
+    public $singleChoicesCounter = [];
+    public $multiChoicesCounter = [];
     public $questionType = [1 => 0];
-    public $questionText;
+    public $questionText = [1 => ''];
     public $freeTextAns, $singleOptionAns, $multiOptionAns;
-    public $singleCorrect, $multiCorrect;
+    public $singleCorrect;
+    public $multiCorrect = [1 => [1=>false, 2=>false]];
 
     public function rules()
     {
@@ -29,25 +30,58 @@ class Create extends Component
         ];
     }
 
+    public function mount()
+    {
+        $this->multiChoicesCounter[$this->questionsInputsCounter] = Answer::InitialChoices;
+        $this->singleChoicesCounter[$this->questionsInputsCounter] = Answer::InitialChoices;
+    }
+
     public function addQuestionInputs()
     {
         $this->questionsInputsCounter++;
         array_push($this->questionType, 0);
+        array_push($this->questionText, '');
+        $this->multiCorrect[$this->questionsInputsCounter] = [1=>false, 2=>false];
+        $this->multiChoicesCounter[$this->questionsInputsCounter] = Answer::InitialChoices;
+        $this->singleChoicesCounter[$this->questionsInputsCounter] = Answer::InitialChoices;
     }
 
-    public function addChoice(){$this->choicesCounter++;}
-
-    public function deleteChoice()
+    public function deleteQuestion($questionIndex)
     {
-        unset($this->singleOptionAns[$this->choicesCounter]);
-        $this->choicesCounter--;
-    }
-
-    public function deleteQuestion()
-    {
-        unset($this->questionText[$this->questionsInputsCounter]);
+        unset($this->questionText[$questionIndex]);
+        $this->questionType = array_values($this->questionType);
+        unset($this->questionType[$questionIndex]);
+        $this->questionType = array_values($this->questionType);
+        unset($this->multiCorrect[$questionIndex]);
+        $this->multiCorrect = array_values($this->multiCorrect);
         $this->questionsInputsCounter--;
     }
+
+    public function addChoice($questionIndex){
+        $this->singleChoicesCounter[$questionIndex] = $this->singleChoicesCounter[$questionIndex] + 1;
+    }
+
+    public function deleteChoice($questionIndex)
+    {
+        unset($this->singleOptionAns[$this->singleChoicesCounter[$questionIndex]]);
+        $this->singleChoicesCounter[$questionIndex] = $this->singleChoicesCounter[$questionIndex] - 1;
+
+    }
+
+    public function addMultiChoice($questionIndex){
+        $this->multiCorrect[$questionIndex][$this->multiChoicesCounter[$questionIndex]] = false;
+        $this->multiChoicesCounter[$questionIndex] = $this->multiChoicesCounter[$questionIndex] + 1;
+    }
+
+    public function deleteMultiChoice($questionIndex, $choiceIndex)
+    {
+        unset($this->multiCorrect[$questionIndex][$this->multiChoicesCounter[$questionIndex]]);
+        $this->multiCorrect = array_values($this->multiCorrect);
+        unset($this->multiOptionAns[$questionIndex][$this->multiChoicesCounter[$choiceIndex]]);
+        $this->multiChoicesCounter[$questionIndex] = $this->multiChoicesCounter[$questionIndex] - 1;
+    }
+
+
 
     public function save()
     {
@@ -63,7 +97,7 @@ class Create extends Component
         session()->flash('status', 'Question(s) Added Successfully');
         return redirect()->route('questionnaire.index');
     }
-    
+
     public function saveAnswers(int $key, Question $question): void
     {
 //        save free text
@@ -100,11 +134,16 @@ class Create extends Component
                 [
                     'multiOptionAns' => ['required'],
                     'multiOptionAns.*' => ['required'],
+                    'multiCorrect' => ['required'],
                 ]
             );
 
-            foreach (collect($this->multiOptionAns)->flatten() as $answer) {
-                $question->answers()->save(new Answer(['answer' => $answer]));
+            foreach (collect($this->multiOptionAns[$key])->flatten() as $key => $answer) {
+                $question->answers()->save(new Answer(
+                    [
+                        'answer' => $answer, 'is_correct' => collect($this->multiCorrect)->flatten()[$key]
+
+                    ]));
             }
         }
     }

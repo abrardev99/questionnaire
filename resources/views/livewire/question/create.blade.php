@@ -12,8 +12,7 @@
                     <div class="card-body">
 
                         <form wire:submit.prevent="save">
-
-                            @for($questionIndex=1;  $questionIndex<=$questionsInputsCounter; $questionIndex++)
+                               @for($questionIndex=1;  $questionIndex<=$questionsInputsCounter; $questionIndex++)
                                 <div class="form-group row">
                                     <label for="type" class="col-sm-4 col-form-label">Question Type</label>
                                     <div class="col-sm-5">
@@ -34,7 +33,7 @@
                                     <div>
                                     @if($questionIndex > 1)
                                         <div class="col-sm-3">
-                                            <button role="button" wire:click.prevent="deleteQuestion"
+                                            <button role="button" wire:click.prevent="deleteQuestion({{ $questionIndex }})"
                                                     class="btn btn-link text-danger">Delete
                                             </button>
                                         </div>
